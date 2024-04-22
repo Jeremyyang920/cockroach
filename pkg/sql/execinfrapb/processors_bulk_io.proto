@@ -480,3 +480,18 @@ message CloudStorageTestSpec {
   optional Params params = 2 [(gogoproto.nullable) = false];
   // NEXT ID: 3;
 }
+
+message ReplicationSpec {
+    // JobID of the job that ran the replicationProcessor.
+    optional int64 job_id = 1 [
+      (gogoproto.nullable) = false,
+      (gogoproto.customname) = "JobID",
+      (gogoproto.casttype) = "github.com/cockroachdb/cockroach/pkg/jobs/jobspb.JobID"
+    ];
+  
+    // RowLevelTTLDetails are the details of the job that ran the replicationProcessor.
+    optional jobs.jobspb.ActiveReplicationDetails replication_details = 2 [
+      (gogoproto.nullable) = false,
+      (gogoproto.customname) = "ActiveReplicationDetails"
+    ];
+}

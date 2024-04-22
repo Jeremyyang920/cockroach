@@ -362,6 +362,18 @@ func (p *DummyEvalPlanner) ExtendHistoryRetention(ctx context.Context, id jobspb
 	return errors.WithStack(errEvalPlanner)
 }
 
+func (p *DummyEvalPlanner) StartActiveReplicationJob(
+	ctx context.Context, desc string, targetclusterConnStr string,
+) (jobspb.JobID, error) {
+	return 0, errors.WithStack(errEvalPlanner)
+}
+
+func (p *DummyEvalPlanner) StartReplicationJob(
+	ctx context.Context, desc string, targetclusterConnStr string,
+) (jobspb.JobID, error) {
+	return 0, errors.WithStack(errEvalPlanner)
+}
+
 var _ eval.Planner = &DummyEvalPlanner{}
 
 var errEvalPlanner = pgerror.New(pgcode.ScalarOperationCannotRunWithoutFullSessionContext,

@@ -1017,3 +1017,30 @@ func (p *planner) StartHistoryRetentionJob(
 func (p *planner) ExtendHistoryRetention(ctx context.Context, jobID jobspb.JobID) error {
 	return ExtendHistoryRetention(ctx, p.EvalContext(), p.InternalSQLTxn(), jobID)
 }
+
+func (p *planner) StartReplicationJob(
+	ctx context.Context, targetConnStr, tableName string,
+) (jobspb.JobID, error) {
+	if !p.ExecCfg().Settings.Version.IsActive(ctx, clusterversion.V24_1) {
+		return 0, pgerror.New(pgcode.FeatureNotSupported,
+			"replication job not supported before V24.1")
+	}
+	evalCtx := p.EvalContext()
+	execConfig := evalCtx.Planner.ExecutorConfig().(*ExecutorConfig)
+	registry := execConfig.JobRegistry
+
+	jr := jobs.Record{
+		Description: "Start Replication Job",
+		Username:    evalCtx.SessionData().User(),
+		Details: jobspb.ActiveReplicationDetails{
+			TargetClusterConnStr: targetConnStr,
+			TableName:            tableName},
+		Progress: jobspb.ActiveReplicationProgress{},
+		JobID:    registry.MakeJobID(),
+	}
+
+	if _, err := registry.CreateAdoptableJobWithTxn(ctx, jr, jr.JobID, p.InternalSQLTxn()); err != nil {
+		return 0, err
+	}
+	return jr.JobID, nil
+}

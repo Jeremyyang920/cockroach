@@ -443,6 +443,8 @@ type Planner interface {
 	// ExtendHistoryRetentionJob extends the lifetime of a a cluster-level
 	// protected timestamp.
 	ExtendHistoryRetention(ctx context.Context, id jobspb.JobID) error
+
+	StartReplicationJob(ctx context.Context, targetConnStr, tableName string) (jobspb.JobID, error)
 }
 
 // InternalRows is an iterator interface that's exposed by the internal
